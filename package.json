@@ -1,0 +1,8 @@
+{
+  "name": "myFirstApp",
+  "version": "1.0.0",
+  "description": "Mercedes F1 themed app",
+  "main": "index.html",
+  "author": "yeonjeihyung",
+  "license": "ISC"
+}
