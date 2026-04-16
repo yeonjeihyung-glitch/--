@@ -36,6 +36,22 @@ function handleSignup(event) {
     navigateTo('login.html');
 }
 
+/**
+ * 로그인 기록을 저장하는 함수
+ */
+function recordLogin(user) {
+    const history = JSON.parse(localStorage.getItem('loginHistory') || '[]');
+    const newEntry = {
+        name: user.name,
+        email: user.email,
+        loginTime: new Date().toLocaleString()
+    };
+    
+    // 최근 5개만 유지 (필요에 따라 조절)
+    history.unshift(newEntry);
+    localStorage.setItem('loginHistory', JSON.stringify(history.slice(0, 5)));
+}
+
 function handleLogin(event) {
     event.preventDefault();
 
@@ -55,7 +71,10 @@ function handleLogin(event) {
         return;
     }
 
-    // 로그인 성공 시 세션 저장 및 애니메이션 플래그 설정
+    // 로그인 정보 기록 저장
+    recordLogin(user);
+
+    // 로그인 세션 저장 및 애니메이션 플래그 설정
     localStorage.setItem('loggedInUser', JSON.stringify(user));
     sessionStorage.setItem('playLoginAnimation', 'true');
 
@@ -69,6 +88,27 @@ function handleLogout() {
     location.reload();
 }
 
+/**
+ * 로그인 기록을 화면에 표시할 HTML 생성
+ */
+function getLoginHistoryHTML() {
+    const history = JSON.parse(localStorage.getItem('loginHistory') || '[]');
+    if (history.length === 0) return '';
+
+    let html = `
+        <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); width: 100%;">
+            <p style="font-size: 11px; color: var(--petronas-cyan); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">최근 로그인 기록</p>
+            <ul style="list-style: none; font-size: 13px; color: var(--text-muted);">
+    `;
+    
+    history.forEach(entry => {
+        html += `<li style="margin-bottom: 5px;">${entry.loginTime}</li>`;
+    });
+
+    html += `</ul></div>`;
+    return html;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const welcomeArea = document.getElementById('welcomeArea');
     const authButtons = document.getElementById('authButtons');
@@ -78,14 +118,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loggedInUser && welcomeArea && authButtons) {
         authButtons.style.display = 'none';
 
+        const welcomeContent = `
+            <div class="welcome-content">
+                <h2 style="font-size: 28px; margin-bottom: 10px;">${loggedInUser.name}님, 환영합니다!</h2>
+                <p style="color: rgba(255,255,255,0.7); margin-bottom: 20px;">오늘도 즐거운 하루 되세요.</p>
+                <button onclick="handleLogout()" class="btn btn-secondary">로그아웃</button>
+                ${getLoginHistoryHTML()}
+            </div>
+        `;
+
         if (playAnim === 'true') {
-            // 애니메이션 실행 로직
-            sessionStorage.removeItem('playLoginAnimation'); // 다시 뜨지 않게 즉시 삭제
-            
-            // 환영 문구를 일단 가림
+            sessionStorage.removeItem('playLoginAnimation');
             welcomeArea.classList.add('welcome-hidden');
+            welcomeArea.innerHTML = welcomeContent;
             
-            // 자동차 아이콘(SVG) 생성
             const car = document.createElement('div');
             car.className = 'f1-car';
             car.innerHTML = `
@@ -100,35 +146,16 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             document.body.appendChild(car);
 
-            // 짧은 지연 후 애니메이션 시작
             setTimeout(() => {
                 car.classList.add('driving');
-                
-                // 자동차가 지나간 후 (1.2초 후) 환영 문구 표시
                 setTimeout(() => {
-                    welcomeArea.innerHTML = `
-                        <div class="welcome-content">
-                            <h2 style="font-size: 28px; margin-bottom: 10px;">${loggedInUser.name}님, 환영합니다!</h2>
-                            <p style="color: rgba(255,255,255,0.7); margin-bottom: 20px;">오늘도 즐거운 하루 되세요.</p>
-                            <button onclick="handleLogout()" class="btn btn-secondary">로그아웃</button>
-                        </div>
-                    `;
                     welcomeArea.classList.remove('welcome-hidden');
                     welcomeArea.classList.add('welcome-visible');
-                    
-                    // 자동차 엘리먼트 제거
                     setTimeout(() => car.remove(), 500);
                 }, 1000);
             }, 100);
         } else {
-            // 애니메이션 없이 바로 표시
-            welcomeArea.innerHTML = `
-                <div class="welcome-content">
-                    <h2 style="font-size: 28px; margin-bottom: 10px;">${loggedInUser.name}님, 환영합니다!</h2>
-                    <p style="color: rgba(255,255,255,0.7); margin-bottom: 20px;">오늘도 즐거운 하루 되세요.</p>
-                    <button onclick="handleLogout()" class="btn btn-secondary">로그아웃</button>
-                </div>
-            `;
+            welcomeArea.innerHTML = welcomeContent;
         }
     }
 });
