@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 - F1 Edition</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    
+    <div class="container">
+        <h2>로그인</h2>
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="input-group">
+                <label for="email">이메일 주소</label>
+                <input type="email" id="email" name="email" placeholder="example@mercedes.com" required autocomplete="email">
+            </div>
+            <div class="input-group">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" name="password" placeholder="********" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn">로그인</button>
+        </form>
+        
+        <div class="links">
+            <p>계정이 없으신가요? <a href="#" onclick="navigateTo('signup.html')">회원가입</a></p>
+            <a href="#" onclick="navigateTo('index.html')" class="back-link">← 처음으로</a>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
