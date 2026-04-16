@@ -1,0 +1,11 @@
+{
+  "name": "myfirstapp",
+  "version": "1.0.0",
+  "description": "Mercedes F1 themed mobile web app",
+  "main": "index.html",
+  "scripts": {
+    "start": "echo \"Ready to deploy\""
+  },
+  "author": "yeonjeihyung",
+  "license": "ISC"
+}
